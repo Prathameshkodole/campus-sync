@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Sync - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #23a2f6;
+            --accent-color: #ff512f;
+            --background-dark: #000000;
+            --text-light: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(35, 162, 246, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Splash Screen Styles */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--background-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.3s ease-out;
+        }
+
+        .logo {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            animation: logoReveal 0.4s ease-out forwards;
+        }
+
+        .circle-outer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: rotateOuter 2s linear infinite;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .circle-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 60%;
+            border: 4px solid var(--primary-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotateInner 2s linear infinite reverse;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .splash-title {
+            font-size: 3em;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: titleReveal 0.4s ease-out forwards 0.2s;
+            text-shadow: 0 0 10px rgba(35, 162, 246, 0.3);
+        }
+
+        @keyframes logoReveal {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes titleReveal {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes rotateOuter {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateInner {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            justify-content: center;
+        }
+
+        .login-options {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 50px;
+            width: 100%;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 350px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 250px;
+        }
+
+        .login-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .login-card h2 {
+            margin-bottom: 20px;
+            color: var(--text-light);
+            font-size: 1.5em;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(35, 162, 246, 0.3);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: var(--background-dark);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 1.1em;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(35, 162, 246, 0.4);
+        }
+
+        .register-link {
+            margin-top: 20px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .register-link a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .login-options {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+                padding: 0 15px;
+            }
+
+            .login-card {
+                width: 100%;
+                max-width: 350px;
+                min-height: 220px;
+            }
+
+            .splash-title {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="logo">
+            <div class="circle-outer"></div>
+            <div class="circle-inner"></div>
+        </div>
+        <h1 class="splash-title">Campus Sync</h1>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="logo">
+            <div class="circle-outer"></div>
+            <div class="circle-inner"></div>
+        </div>
+        <h1 class="splash-title">Campus Sync</h1>
+        
+        <div class="login-options">
+            <div class="login-card" onclick="window.location.href='/student-login'">
+                <h2>Student Portal</h2>
+                <a href="/student-login" class="btn">Login as Student</a>
+                <p class="register-link">New student? <a href="/student-register">Register here</a></p>
+            </div>
+            
+            <div class="login-card" onclick="window.location.href='/teacher-login'">
+                <h2>Teacher Portal</h2>
+                <a href="/teacher-login" class="btn">Login as Teacher</a>
+                <p class="register-link">New teacher? <a href="/teacher-register">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show splash screen for 1.5 seconds
+        setTimeout(() => {
+            const splashScreen = document.getElementById('splashScreen');
+            const mainContent = document.getElementById('mainContent');
+            
+            splashScreen.style.opacity = '0';
+            mainContent.style.opacity = '1';
+            
+            setTimeout(() => {
+                splashScreen.style.display = 'none';
+            }, 300);
+        }, 1500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Sync - Student Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1845ad;
+            --secondary-color: #23a2f6;
+            --accent-color: #ff512f;
+            --background-dark: #080710;
+            --text-light: #ffffff;
+            --text-dark: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            min-height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            width: 120px;
+            margin-bottom: 10px;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 15px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links i {
+            margin-right: 10px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .calendar-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            height: 600px;
+        }
+
+        .tasks-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        /* Right Sidebar Styles */
+        .right-sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .notifications {
+            flex: 1;
+        }
+
+        .chatbot {
+            height: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .chat-input button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: var(--primary-color);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .chat-input button:hover {
+            background: var(--secondary-color);
+        }
+
+        /* Task Styles */
+        .task-list {
+            list-style: none;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .add-task {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .add-task input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .add-task button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: var(--accent-color);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .notification-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .notification-item .time {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Chat Message Styles */
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 85%;
+        }
+
+        .message.user {
+            background: rgba(255, 255, 255, 0.1);
+            margin-left: auto;
+            border-radius: 15px 15px 0 15px;
+        }
+
+        .message.bot {
+            background: var(--primary-color);
+            margin-right: auto;
+            border-radius: 15px 15px 15px 0;
+        }
+
+        .message p {
+            margin: 0;
+            word-wrap: break-word;
+        }
+
+        .message .time {
+            font-size: 0.7em;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .chat-messages {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .typing-indicator {
+            display: block;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: pulse 1.5s infinite;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+
+        .error-message {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.4; }
+        }
+
+        /* Additional Styles */
+        .typing-indicator {
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .notification-item.unread {
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .notification-item.read {
+            opacity: 0.7;
+        }
+
+        .delete-task {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .delete-task:hover {
+            color: #ff3311;
+        }
+
+        #calendar {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .fc {
+            height: 100%;
+        }
+
+        .fc .fc-toolbar.fc-header-toolbar {
+            margin-bottom: 1em;
+        }
+
+        .fc .fc-button-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .fc .fc-button-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .fc-theme-standard td, .fc-theme-standard th {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .fc-theme-standard .fc-scrollgrid {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .fc-daygrid-day-number {
+            color: var(--text-light);
+        }
+
+        .fc-col-header-cell-cushion {
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">
+                <img src="assets/logo.png" alt="Campus Sync Logo">
+                <h2>Campus Sync</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-calendar"></i> Calendar</a></li>
+                <li><a href="#"><i class="fas fa-tasks"></i> Tasks</a></li>
+                <li><a href="#"><i class="fas fa-bell"></i> Notifications</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="calendar-section">
+                <h2>Calendar</h2>
+                <div id="calendar"></div>
+            </div>
+            <div class="tasks-section">
+                <h2>Tasks</h2>
+                <ul class="task-list">
+                    <!-- Tasks will be dynamically added here -->
+                </ul>
+                <div class="add-task">
+                    <input type="text" id="taskInput" placeholder="Add a new task...">
+                    <button id="addTaskBtn"><i class="fas fa-plus"></i> Add Task</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="right-sidebar">
+            <div class="notifications">
+                <h2>Notifications</h2>
+                <div class="notifications-list">
+                    <!-- Notifications will be dynamically added here -->
+                </div>
+            </div>
+            <div class="chatbot">
+                <h2>AI Assistant</h2>
+                <div class="chat-messages">
+                    <!-- Chat messages will be dynamically added here -->
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chatInput" placeholder="Ask me anything...">
+                    <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html> 

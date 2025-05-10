@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Sync - Teacher Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="/js/auth.js"></script>
+    <style>
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #23a2f6;
+            --accent-color: #ff512f;
+            --background-dark: #000000;
+            --text-light: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-right: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            padding: 20px 0;
+        }
+
+        .logo {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .circle-outer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            animation: rotateOuter 4s linear infinite;
+        }
+
+        .circle-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60%;
+            height: 60%;
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotateInner 4s linear infinite reverse;
+        }
+
+        @keyframes rotateOuter {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes rotateInner {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .brand-name {
+            font-size: 1.5em;
+            font-weight: 600;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .nav-link {
+            padding: 12px 15px;
+            border-radius: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: var(--secondary-color);
+        }
+
+        .nav-link i {
+            width: 20px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .welcome-text {
+            font-size: 1.8em;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: var(--text-light);
+        }
+
+        .btn-primary:hover {
+            background: #1b7ac0;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-outline:hover {
+            background: var(--glass-bg);
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Sections */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+
+        .attendance-list, .event-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .attendance-item, .event-item {
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .attendance-item:hover, .event-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--background-dark);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-light);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: var(--glass-bg);
+            color: var(--text-light);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+        }
+
+        /* Additional Styles */
+        .events-list, .attendance-records, .report-content {
+            margin-top: 20px;
+        }
+
+        .event-card, .attendance-record-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .report-filters {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .report-filters select {
+            padding: 8px 15px;
+            border-radius: 8px;
+            background: var(--glass-bg);
+            color: var(--text-light);
+            border: 1px solid var(--glass-border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--secondary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="circle-outer"></div>
+                    <div class="circle-inner"></div>
+                </div>
+                <span class="brand-name">Campus Sync</span>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#" class="nav-link active" onclick="showDashboardSection()"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#" class="nav-link" onclick="showEventsSection()"><i class="fas fa-calendar"></i> Events</a></li>
+                    <li><a href="#" class="nav-link" onclick="showAttendanceSection()"><i class="fas fa-clipboard-check"></i> Attendance</a></li>
+                    <li><a href="#" class="nav-link" onclick="showReportsSection()"><i class="fas fa-chart-bar"></i> Reports</a></li>
+                    <li><a href="#" class="nav-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection">
+                <div class="header">
+                    <h1 class="welcome-text">Welcome, <span id="teacherName">Teacher</span></h1>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="showAddEventModal()">
+                            <i class="fas fa-plus"></i> Add Event
+                        </button>
+                        <button class="btn btn-outline" onclick="showAttendanceModal()">
+                            <i class="fas fa-clipboard-check"></i> Take Attendance
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Events Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Upcoming Events</h2>
+                            <button class="btn btn-outline" onclick="showEventsSection()">View All</button>
+                        </div>
+                        <ul class="event-list" id="upcomingEvents">
+                            <!-- Events will be populated dynamically -->
+                        </ul>
+                    </div>
+
+                    <!-- Recent Attendance Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Attendance</h2>
+                            <button class="btn btn-outline" onclick="showAttendanceSection()">View All</button>
+                        </div>
+                        <ul class="attendance-list" id="recentAttendance">
+                            <!-- Attendance records will be populated dynamically -->
+                        </ul>
+                    </div>
+
+                    <!-- Quick Stats Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Quick Stats</h2>
+                            <button class="btn btn-outline" onclick="showReportsSection()">Details</button>
+                        </div>
+                        <div id="quickStats">
+                            <!-- Stats will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Section -->
+            <div id="eventsSection" style="display: none;">
+                <div class="header">
+                    <h1 class="section-title">Events Management</h1>
+                    <button class="btn btn-primary" onclick="showAddEventModal()">
+                        <i class="fas fa-plus"></i> Add Event
+                    </button>
+                </div>
+                <div class="events-list" id="allEvents">
+                    <!-- Events will be populated here -->
+                </div>
+            </div>
+
+            <!-- Attendance Section -->
+            <div id="attendanceSection" style="display: none;">
+                <div class="header">
+                    <h1 class="section-title">Attendance Management</h1>
+                    <button class="btn btn-primary" onclick="showAttendanceModal()">
+                        <i class="fas fa-clipboard-check"></i> Take Attendance
+                    </button>
+                </div>
+                <div class="attendance-records" id="allAttendance">
+                    <!-- Attendance records will be populated here -->
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reportsSection" style="display: none;">
+                <div class="header">
+                    <h1 class="section-title">Reports</h1>
+                    <div class="report-filters">
+                        <select id="reportType" onchange="loadReport()">
+                            <option value="attendance">Attendance Report</option>
+                            <option value="events">Events Report</option>
+                            <option value="department">Department-wise Report</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="report-content" id="reportContent">
+                    <!-- Report content will be populated here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal" id="addEventModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('addEventModal')">&times;</button>
+            <h2>Add New Event</h2>
+            <form id="addEventForm" onsubmit="handleAddEvent(event)">
+                <div class="form-group">
+                    <label for="eventTitle">Event Title</label>
+                    <input type="text" id="eventTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventDescription">Description</label>
+                    <textarea id="eventDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="eventDate">Date</label>
+                    <input type="datetime-local" id="eventDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="eventEndDate">End Date</label>
+                    <input type="datetime-local" id="eventEndDate" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="attendanceRequired">
+                        Attendance Required
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Create Event</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Take Attendance Modal -->
+    <div class="modal" id="attendanceModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal('attendanceModal')">&times;</button>
+            <h2>Take Attendance</h2>
+            <form id="attendanceForm" onsubmit="event.preventDefault(); handleAttendanceSubmit();">
+                <div class="form-group">
+                    <label for="eventSelect">Select Event</label>
+                    <select id="eventSelect" required onchange="loadStudentsForEvent(this.value)">
+                        <!-- Events will be populated dynamically -->
+                    </select>
+                </div>
+                <div id="studentList">
+                    <!-- Student list will be populated dynamically -->
+                </div>
+                <button type="submit" class="btn btn-primary">Save Attendance</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            showDashboardSection(); // Show dashboard by default
+        });
+
+        async function initializeDashboard() {
+            // Load teacher info
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                document.getElementById('teacherName').textContent = user.name;
+            }
+
+            // Load upcoming events
+            await loadUpcomingEvents();
+            
+            // Load recent attendance
+            await loadRecentAttendance();
+            
+            // Load quick stats
+            await loadQuickStats();
+        }
+
+        async function loadUpcomingEvents() {
+            try {
+                const response = await fetch('/api/events', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const events = await response.json();
+                
+                const eventsList = document.getElementById('upcomingEvents');
+                eventsList.innerHTML = events.slice(0, 5).map(event => `
+                    <li class="event-item">
+                        <div>
+                            <strong>${event.title}</strong>
+                            <p>${new Date(event.date).toLocaleDateString()}</p>
+                        </div>
+                        <div class="event-actions">
+                            <button class="btn btn-outline" onclick="editEvent('${event._id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline" onclick="deleteEvent('${event._id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </li>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        async function loadRecentAttendance() {
+            try {
+                const response = await fetch('/api/attendance/recent', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const attendance = await response.json();
+                
+                const attendanceList = document.getElementById('recentAttendance');
+                attendanceList.innerHTML = attendance.slice(0, 5).map(record => `
+                    <li class="attendance-item">
+                        <div>
+                            <strong>${record.event.title}</strong>
+                            <p>${record.studentsPresent} students present</p>
+                        </div>
+                        <button class="btn btn-outline" onclick="viewAttendanceDetails('${record._id}')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </li>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading attendance:', error);
+            }
+        }
+
+        async function loadQuickStats() {
+            try {
+                const response = await fetch('/api/teacher/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const stats = await response.json();
+                
+                document.getElementById('quickStats').innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <h3>Total Events</h3>
+                            <p>${stats.totalEvents}</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Average Attendance</h3>
+                            <p>${stats.averageAttendance}%</p>
+                        </div>
+                        <div class="stat-item">
+                            <h3>Active Students</h3>
+                            <p>${stats.activeStudents}</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Event Management Functions
+        async function handleAddEvent(event) {
+            event.preventDefault();
+            try {
+                const eventData = {
+                    title: document.getElementById('eventTitle').value,
+                    description: document.getElementById('eventDescription').value,
+                    date: document.getElementById('eventDate').value,
+                    endDate: document.getElementById('eventEndDate').value,
+                    attendanceRequired: document.getElementById('attendanceRequired').checked
+                };
+
+                const response = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(eventData)
+                });
+
+                if (response.ok) {
+                    closeModal('addEventModal');
+                    await loadUpcomingEvents();
+                } else {
+                    throw new Error('Failed to create event');
+                }
+            } catch (error) {
+                console.error('Error creating event:', error);
+                alert('Failed to create event. Please try again.');
+            }
+        }
+
+        async function deleteEvent(eventId) {
+            if (confirm('Are you sure you want to delete this event?')) {
+                try {
+                    const response = await fetch(`/api/events/${eventId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        showAlert('Event deleted successfully', 'success');
+                        // Refresh all relevant sections
+                        loadUpcomingEvents();
+                        loadAllEvents();
+                        loadQuickStats();
+                    } else {
+                        const data = await response.json();
+                        throw new Error(data.error || 'Failed to delete event');
+                    }
+                } catch (error) {
+                    console.error('Error deleting event:', error);
+                    showAlert(error.message || 'Failed to delete event. Please try again.', 'error');
+                }
+            }
+        }
+
+        // Attendance Management Functions
+        function handleAttendanceSubmit() {
+            const eventId = document.getElementById('eventSelect').value;
+            if (!eventId) {
+                showAlert('Please select an event', 'error');
+                return;
+            }
+
+            const form = document.getElementById('attendanceForm');
+            const formData = new FormData(form);
+            const attendance = [];
+            
+            // Get all student rows
+            const studentRows = form.querySelectorAll('.student-row');
+            studentRows.forEach(row => {
+                const studentId = row.dataset.studentId;
+                const status = formData.get(`status_${studentId}`);
+                if (status) {
+                    attendance.push({
+                        studentId,
+                        status
+                    });
+                }
+            });
+
+            if (attendance.length === 0) {
+                showAlert('Please mark attendance for at least one student', 'error');
+                return;
+            }
+
+            fetch(`/api/events/${eventId}/attendance`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ attendance })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to update attendance');
+                }
+                return response.json();
+            })
+            .then(updatedEvent => {
+                // Close the modal
+                closeModal('attendanceModal');
+                
+                // Show success message
+                showAlert('Attendance updated successfully!', 'success');
+                
+                // Refresh all relevant sections
+                loadRecentAttendance();
+                loadAllAttendance();
+                loadQuickStats();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to update attendance. Please try again.', 'error');
+            });
+        }
+
+        function loadStudentsForEvent(eventId) {
+            fetch(`/api/events/${eventId}/students`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch students');
+                }
+                return response.json();
+            })
+            .then(students => {
+                const studentList = document.getElementById('studentList');
+                studentList.innerHTML = '';
+                
+                students.forEach(student => {
+                    const row = document.createElement('div');
+                    row.className = 'student-row mb-3';
+                    row.dataset.studentId = student._id;
+                    
+                    row.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">${student.name}</h6>
+                                <small class="text-muted">PRN: ${student.prn}</small>
+                            </div>
+                            <div class="btn-group">
+                                <input type="radio" class="btn-check" name="status_${student._id}" id="present_${student._id}" value="present" ${student.status === 'present' ? 'checked' : ''}>
+                                <label class="btn btn-outline-success" for="present_${student._id}">Present</label>
+                                
+                                <input type="radio" class="btn-check" name="status_${student._id}" id="absent_${student._id}" value="absent" ${student.status === 'absent' ? 'checked' : ''}>
+                                <label class="btn btn-outline-danger" for="absent_${student._id}">Absent</label>
+                            </div>
+                        </div>
+                    `;
+                    
+                    studentList.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Failed to load students. Please try again.', 'danger');
+            });
+        }
+
+        // Modal Functions
+        function showAddEventModal() {
+            document.getElementById('addEventModal').classList.add('active');
+        }
+
+        function showAttendanceModal() {
+            document.getElementById('attendanceModal').classList.add('active');
+            loadEventsForAttendance();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Navigation Functions
+        function showDashboardSection() {
+            hideAllSections();
+            document.getElementById('dashboardSection').style.display = 'block';
+            setActiveLink('Dashboard');
+        }
+
+        function showEventsSection() {
+            hideAllSections();
+            document.getElementById('eventsSection').style.display = 'block';
+            setActiveLink('Events');
+            loadAllEvents();
+        }
+
+        function showAttendanceSection() {
+            hideAllSections();
+            document.getElementById('attendanceSection').style.display = 'block';
+            setActiveLink('Attendance');
+            loadAllAttendance();
+        }
+
+        function showReportsSection() {
+            hideAllSections();
+            document.getElementById('reportsSection').style.display = 'block';
+            setActiveLink('Reports');
+            loadReport();
+        }
+
+        function hideAllSections() {
+            const sections = ['dashboardSection', 'eventsSection', 'attendanceSection', 'reportsSection'];
+            sections.forEach(section => {
+                document.getElementById(section).style.display = 'none';
+            });
+        }
+
+        function setActiveLink(section) {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.textContent.includes(section)) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Events Section Functions
+        async function loadAllEvents() {
+            try {
+                const response = await fetch('/api/events', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const events = await response.json();
+                
+                const eventsList = document.getElementById('allEvents');
+                eventsList.innerHTML = events.map(event => `
+                    <div class="event-card">
+                        <div class="event-header">
+                            <h3>${event.title}</h3>
+                            <div class="event-actions">
+                                <button class="btn btn-outline" onclick="editEvent('${event._id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline" onclick="deleteEvent('${event._id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p>${event.description}</p>
+                        <div class="event-details">
+                            <span><i class="fas fa-calendar"></i> ${new Date(event.date).toLocaleDateString()}</span>
+                            <span><i class="fas fa-clock"></i> ${new Date(event.date).toLocaleTimeString()}</span>
+                            ${event.attendanceRequired ? '<span class="badge"><i class="fas fa-clipboard-check"></i> Attendance Required</span>' : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        // Attendance Section Functions
+        async function loadAllAttendance() {
+            try {
+                const response = await fetch('/api/attendance/all', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const attendance = await response.json();
+                
+                const attendanceList = document.getElementById('allAttendance');
+                attendanceList.innerHTML = attendance.map(record => `
+                    <div class="attendance-record-card">
+                        <div class="attendance-header">
+                            <h3>${record.event.title}</h3>
+                            <span class="date">${new Date(record.event.date).toLocaleDateString()}</span>
+                        </div>
+                        <div class="attendance-stats">
+                            <span>Present: ${record.studentsPresent}</span>
+                            <span>Total: ${record.totalStudents}</span>
+                            <span>Percentage: ${Math.round((record.studentsPresent / record.totalStudents) * 100)}%</span>
+                        </div>
+                        <button class="btn btn-outline" onclick="viewAttendanceDetails('${record._id}')">
+                            View Details
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading attendance records:', error);
+            }
+        }
+
+        // Reports Section Functions
+        async function loadReport() {
+            const reportType = document.getElementById('reportType').value;
+            try {
+                const response = await fetch(`/api/reports/${reportType}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const report = await response.json();
+                
+                const reportContent = document.getElementById('reportContent');
+                switch (reportType) {
+                    case 'attendance':
+                        displayAttendanceReport(report, reportContent);
+                        break;
+                    case 'events':
+                        displayEventsReport(report, reportContent);
+                        break;
+                    case 'department':
+                        displayDepartmentReport(report, reportContent);
+                        break;
+                }
+            } catch (error) {
+                console.error('Error loading report:', error);
+            }
+        }
+
+        function displayAttendanceReport(report, container) {
+            container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3>Average Attendance</h3>
+                        <p>${report.averageAttendance}%</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>Total Events</h3>
+                        <p>${report.totalEvents}</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>Active Students</h3>
+                        <p>${report.activeStudents}</p>
+                    </div>
+                </div>
+                <div class="attendance-chart">
+                    <!-- Add chart visualization here -->
+                </div>
+            `;
+        }
+
+        function displayEventsReport(report, container) {
+            container.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3>Total Events</h3>
+                        <p>${report.totalEvents}</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>Upcoming Events</h3>
+                        <p>${report.upcomingEvents}</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>Past Events</h3>
+                        <p>${report.pastEvents}</p>
+                    </div>
+                </div>
+                <div class="events-timeline">
+                    <!-- Add timeline visualization here -->
+                </div>
+            `;
+        }
+
+        function displayDepartmentReport(report, container) {
+            container.innerHTML = `
+                <div class="stats-grid">
+                    ${Object.entries(report.departmentStats).map(([dept, stats]) => `
+                        <div class="stat-item">
+                            <h3>${dept}</h3>
+                            <p>${stats.averageAttendance}%</p>
+                            <small>Students: ${stats.totalStudents}</small>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="department-chart">
+                    <!-- Add department comparison chart here -->
+                </div>
+            `;
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/teacher-login';
+        }
+
+        // Utility Functions
+        async function loadEventsForAttendance() {
+            try {
+                const response = await fetch('/api/events?attendanceRequired=true', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const events = await response.json();
+                
+                const eventSelect = document.getElementById('eventSelect');
+                eventSelect.innerHTML = events.map(event => `
+                    <option value="${event._id}">${event.title} - ${new Date(event.date).toLocaleDateString()}</option>
+                `).join('');
+
+                // Load student list for first event
+                if (events.length > 0) {
+                    loadStudentsForEvent(events[0]._id);
+                }
+            } catch (error) {
+                console.error('Error loading events:', error);
+            }
+        }
+
+        function showAlert(message, type) {
+            // You can use any notification library here, for now we'll use alert
+            alert(message);
+        }
+    </script>
+</body>
+</html> 
